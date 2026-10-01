@@ -6,7 +6,7 @@ Student cybersecurity project built stage by stage. Educational use only.
 It provides risk indicators, not a definitive malware verdict.
 
 ## Current stage
-Stage 1: console program that accepts a folder, lists files, and counts them.
+Console scanner that searches subfolders and shows file size, extension, path and timestamps.
 
 ## Run
 javac src/*.java -d out
