@@ -1,6 +1,7 @@
-// Console program: scans a folder, shows file details and SHA-256, and checks each hash against the local threat list.
+// Console program: scans a folder, stores each file's result in a ScanResult object, and prints the results.
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -9,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
 
-        System.out.println("=== Simple File Scanner (Stage 5) ===");
+        System.out.println("=== Simple File Scanner (Stage 6) ===");
         System.out.print("Enter folder path: ");
         String path = input.nextLine().trim();
 
@@ -31,6 +32,27 @@ public class Main {
         FileFinder finder = new FileFinder();
         HashCalculator hasher = new HashCalculator();
         List<File> files = finder.findFiles(folder);
+        List<ScanResult> results = new ArrayList<>();
+
+        for (File file : files) {
+            FileInfo info = new FileInfo(file);
+            String hash = hasher.calculateSha256(file);
+            String riskLevel;
+            String reason;
+
+            if (hash.startsWith("error")) {
+                riskLevel = "UNKNOWN";
+                reason = "File could not be read";
+            } else if (database.isKnownThreat(hash)) {
+                riskLevel = "HIGH";
+                reason = "SHA-256 hash found in local threat list: " + database.getThreatName(hash);
+            } else {
+                riskLevel = "LOW";
+                reason = "Hash not found in local threat list";
+            }
+
+            results.add(new ScanResult(info, hash, riskLevel, reason));
+        }
 
         System.out.println();
         System.out.println("Scanning: " + folder.getAbsolutePath());
@@ -39,10 +61,9 @@ public class Main {
         long totalSize = 0;
         int threatsFound = 0;
         int number = 1;
-        for (File file : files) {
-            FileInfo info = new FileInfo(file);
-            String hash = hasher.calculateSha256(file);
-            String relative = folder.toPath().relativize(file.toPath()).toString();
+        for (ScanResult result : results) {
+            FileInfo info = result.getInfo();
+            String relative = folder.toPath().relativize(result.getFile().toPath()).toString();
 
             System.out.println(number + ". " + relative);
             System.out.println("   Path:      " + info.getPath());
@@ -51,22 +72,20 @@ public class Main {
             System.out.println("   Created:   " + info.getCreated());
             System.out.println("   Modified:  " + info.getModified());
             System.out.println("   Accessed:  " + info.getAccessed());
-            System.out.println("   SHA-256:   " + hash);
-
-            if (database.isKnownThreat(hash)) {
-                System.out.println("   Status:    KNOWN TEST THREAT - " + database.getThreatName(hash));
-                threatsFound++;
-            } else {
-                System.out.println("   Status:    not in threat list");
-            }
+            System.out.println("   SHA-256:   " + result.getHash());
+            System.out.println("   Risk:      " + result.getRiskLevel());
+            System.out.println("   Reason:    " + result.getReason());
             System.out.println();
 
             totalSize = totalSize + info.getSize();
+            if (result.getRiskLevel().equals("HIGH")) {
+                threatsFound++;
+            }
             number++;
         }
 
         System.out.println("-----------------------------------");
-        System.out.println("Total files:     " + files.size());
+        System.out.println("Total files:     " + results.size());
         System.out.println("Total size:      " + totalSize + " bytes");
         System.out.println("Threats found:   " + threatsFound);
         System.out.println("Folders scanned: " + finder.getFoldersScanned());
