@@ -1,4 +1,4 @@
-// Console program: scans a folder, stores each file's result in a ScanResult object, and prints the results.
+// Console program: scans a folder, scores every file with RiskScorer, stores ScanResult objects and prints the results.
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
 
-        System.out.println("=== Simple File Scanner (Stage 6) ===");
+        System.out.println("=== Simple File Scanner (Stage 7) ===");
         System.out.print("Enter folder path: ");
         String path = input.nextLine().trim();
 
@@ -37,21 +37,11 @@ public class Main {
         for (File file : files) {
             FileInfo info = new FileInfo(file);
             String hash = hasher.calculateSha256(file);
-            String riskLevel;
-            String reason;
 
-            if (hash.startsWith("error")) {
-                riskLevel = "UNKNOWN";
-                reason = "File could not be read";
-            } else if (database.isKnownThreat(hash)) {
-                riskLevel = "HIGH";
-                reason = "SHA-256 hash found in local threat list: " + database.getThreatName(hash);
-            } else {
-                riskLevel = "LOW";
-                reason = "Hash not found in local threat list";
-            }
+            RiskScorer scorer = new RiskScorer();
+            scorer.calculate(info, hash, database);
 
-            results.add(new ScanResult(info, hash, riskLevel, reason));
+            results.add(new ScanResult(info, hash, scorer.getScore(), scorer.getRiskLevel(), scorer.getReason()));
         }
 
         System.out.println();
@@ -59,8 +49,12 @@ public class Main {
         System.out.println("-----------------------------------");
 
         long totalSize = 0;
-        int threatsFound = 0;
+        int high = 0;
+        int medium = 0;
+        int low = 0;
+        int unknown = 0;
         int number = 1;
+
         for (ScanResult result : results) {
             FileInfo info = result.getInfo();
             String relative = folder.toPath().relativize(result.getFile().toPath()).toString();
@@ -73,13 +67,21 @@ public class Main {
             System.out.println("   Modified:  " + info.getModified());
             System.out.println("   Accessed:  " + info.getAccessed());
             System.out.println("   SHA-256:   " + result.getHash());
+            System.out.println("   Score:     " + result.getScore());
             System.out.println("   Risk:      " + result.getRiskLevel());
             System.out.println("   Reason:    " + result.getReason());
             System.out.println();
 
             totalSize = totalSize + info.getSize();
+
             if (result.getRiskLevel().equals("HIGH")) {
-                threatsFound++;
+                high++;
+            } else if (result.getRiskLevel().equals("MEDIUM")) {
+                medium++;
+            } else if (result.getRiskLevel().equals("LOW")) {
+                low++;
+            } else {
+                unknown++;
             }
             number++;
         }
@@ -87,7 +89,10 @@ public class Main {
         System.out.println("-----------------------------------");
         System.out.println("Total files:     " + results.size());
         System.out.println("Total size:      " + totalSize + " bytes");
-        System.out.println("Threats found:   " + threatsFound);
+        System.out.println("High risk:       " + high);
+        System.out.println("Medium risk:     " + medium);
+        System.out.println("Low risk:        " + low);
+        System.out.println("Unknown:         " + unknown);
         System.out.println("Folders scanned: " + finder.getFoldersScanned());
         System.out.println("Folders skipped: " + finder.getFoldersSkipped());
     }
