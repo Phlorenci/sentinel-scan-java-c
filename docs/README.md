@@ -74,3 +74,8 @@ Enter a folder path when asked, for example `test-data`.
 ## Documentation
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design, class overview, data flow and limitations.
+
+## License
+
+Copyright 2026 Bobur Mirzarakhimov.
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE).
