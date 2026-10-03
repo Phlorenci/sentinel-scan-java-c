@@ -1,6 +1,6 @@
 # SentinelScan Architecture
 
-SentinelScan is an educational static file scanner written in Java. It looks at files, calculates their SHA-256 hash, compares the hash with a local list of test hashes, and gives each file an explainable risk score.
+SentinelScan is a static file scanner written in Java. It looks at files, calculates their SHA-256 hash, compares the hash with a local list of test hashes, and gives each file an explainable risk score.
 
 **It produces risk indicators, not a malware verdict.** A LOW score does not mean a file is safe, and a HIGH score only means the rules matched.
 

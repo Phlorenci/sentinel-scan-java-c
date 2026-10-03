@@ -4,7 +4,7 @@
 
 A student cybersecurity project built step by step. It scans a folder, calculates SHA-256 hashes, compares them with a local list of test hashes and gives every file an explainable risk score.
 
-> Educational use only. SentinelScan gives risk indicators, not a definitive malware verdict. It is not a replacement for antivirus software.
+> SentinelScan gives risk indicators, not a definitive malware verdict. It is not a replacement for antivirus software.
 
 ## Features
 
