@@ -8,7 +8,7 @@ SentinelScan is a static file scanner written in Java. It looks at files, calcul
 
 ```mermaid
 flowchart TD
-    UI["User interface<br/>Main (console now, Swing GUI planned)"]
+    UI["User interface<br/>Main (console) or ScannerWindow (Swing GUI)"]
 
     subgraph Core["Scanning core (runs for every file)"]
         FF[FileFinder] --> FI[FileInfo]
@@ -42,8 +42,8 @@ Dashed boxes are planned and not implemented yet.
 | `ThreatDatabase` | Loads `known_threats.txt` into a `HashMap` and answers "is this hash in the list?" | Done |
 | `RiskScorer` | Applies the scoring rules and keeps a written reason for each rule that matched | Done |
 | `ScanResult` | Holds everything about one scanned file: `FileInfo`, hash, score, risk level, reason | Done |
-| Swing GUI | Folder selection, progress bar, results table, details area | Planned |
-| Background scanning | Run the scan in a separate thread so the window does not freeze | Planned |
+| `ScannerWindow` | Swing window with folder selection, Start Scan, progress bar, counters, results table and details area. Scanning runs in a background `SwingWorker` | Done |
+| `ScanService` | Scans one file (info, hash, score) and returns a `ScanResult`; used by the GUI | Done |
 | C component | Low-level analysis such as PE header parsing | Planned |
 | Entropy and extra heuristics | More scoring rules | Planned |
 | History and report export | Save and export scan results | Planned |
@@ -111,6 +111,8 @@ sentinel-scan-java-c/
 │   ├── HashCalculator.java
 │   ├── ThreatDatabase.java
 │   ├── RiskScorer.java
+│   ├── ScannerWindow.java
+│   ├── ScanService.java
 │   └── ScanResult.java
 ├── test-data/          harmless test files
 ├── docs/
@@ -129,3 +131,4 @@ sentinel-scan-java-c/
 - Last-access timestamps depend on the operating system and may not be reliable.
 - Scanning is single-threaded, so very large folders can be slow.
 - This project is not a replacement for a real antivirus product.
+- The GUI has no Cancel button yet. Closing the window stops the scan.

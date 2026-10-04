@@ -14,6 +14,7 @@ A student cybersecurity project built step by step. It scans a folder, calculate
 - Checks hashes against a local list of test hashes (`known_threats.txt`)
 - Rule-based risk score (LOW, MEDIUM, HIGH, UNKNOWN) with a written reason for each rule
 - Summary with file count, total size and risk counts
+- Desktop GUI (Swing) with results table, progress bar and details; scanning runs in the background so the window stays responsive
 
 ## Requirements
 
@@ -25,7 +26,7 @@ From the project root:
 
 ```
 javac src/*.java -d out
-java -cp out Main
+java -cp out ScannerWindow
 ```
 
 Enter a folder path when asked, for example `test-data`.
@@ -64,8 +65,8 @@ Enter a folder path when asked, for example `test-data`.
 - [x] SHA-256 hashing
 - [x] Local threat hash list
 - [x] Result class and explainable risk scoring
-- [ ] Swing desktop GUI
-- [ ] Background scanning so the window does not freeze
+- [x] Swing desktop GUI
+- [x] Background scanning so the window does not freeze
 - [ ] C component for PE header analysis
 - [ ] Entropy and extra heuristics
 - [ ] Automated test cases
