@@ -1,58 +1,104 @@
 # SentinelScan
 
-**A Hybrid Java/C Platform for Explainable File Risk Assessment**
+A Java Swing desktop application in the cybersecurity area. It scans a folder, gives every file a simple, explainable risk score, and stores scan history and scoring rules in a MySQL database
 
-A student cybersecurity project built step by step. It scans a folder, calculates SHA-256 hashes, compares them with a local list of test hashes and gives every file an explainable risk score.
+> SentinelScan gives risk indicators only. It does not claim to detect malware, and it is not a replacement for antivirus software. Only harmless test files are used in this project.
 
-> SentinelScan gives risk indicators, not a definitive malware verdict. It is not a replacement for antivirus software.
+**Status:** in development (individual course project)
+
+## Why this project
+
+During the summer break I took an Ethical Hacking course and learned a lot about cybersecurity. I wanted to turn part of that knowledge into a working application, and I used the Java skills from my course (GUI, classes, file handling, MySQL) on a practical security problem.
+
+## What it does
+
+1. The user selects a folder in the GUI.
+2. The application lists the files in it: name, size, extension, last-modified date.
+3. Each file gets a risk score and a risk level (LOW, MEDIUM, HIGH) based on simple rules, with a written reason.
+4. The scan and its results are saved in MySQL, so past scans can be reopened later.
 
 ## Features
 
-- Scans a folder and all its subfolders
-- Shows file size, extension, path and timestamps
-- Calculates SHA-256 for every file
-- Checks hashes against a local list of test hashes (`known_threats.txt`)
-- Rule-based risk score (LOW, MEDIUM, HIGH, UNKNOWN) with a written reason for each rule
-- Summary with file count, total size and risk counts
-- Desktop GUI (Swing) with results table, progress bar and details; scanning runs in the background so the window stays responsive
+- [ ] Folder selection and file list in a table
+- [ ] File details: name, path, size, extension, last-modified date
+- [ ] Rule-based risk scoring with a written reason for each score
+- [ ] Details area for the selected file
+- [ ] Scan history stored in MySQL (view, reopen, delete)
+- [ ] Risk rules stored in MySQL (add, edit, delete from the GUI)
+- [ ] Search and filter stored results (by risk level or extension)
+- [ ] Report export to a text file (if time allows)
+- [ ] Summary statistics (if time allows)
 
-## Requirements
+## How MySQL is used
 
-- Java JDK 11 or newer
+| Feature | Database operations |
+|---|---|
+| Save a scan and its results | INSERT |
+| Show scan history and reopen a past scan | SELECT |
+| Edit risk rules from the GUI | INSERT, UPDATE, DELETE |
+| Delete an old scan | DELETE |
+| Filter stored results | SELECT with conditions |
 
-## Run
+Planned tables (the final design may change slightly):
 
-From the project root:
-
-```
-javac src/*.java -d out
-java -cp out ScannerWindow
-```
-
-Enter a folder path when asked, for example `test-data`.
-
-## Example output
-
-```
-2. notes.txt
-   Path:      C:\games\Studies\sentinel-scan-java-c\test-data\notes.txt
-   Size:      16 B
-   Extension: txt
-   SHA-256:   99f86e1be6de5ae82b3f23977b65ebe43cb8359b37b6cf0ab8e6c2eaa0c99193
-   Score:     100
-   Risk:      HIGH
-   Reason:    Hash found in local threat list: Test sample (notes.txt) (+100)
-```
+| Table | Columns |
+|---|---|
+| `scans` | id, folder path, scan date and time, total files, high count, medium count, low count |
+| `scan_results` | id, scan id (links to `scans`), file name, file path, size, extension, last modified, score, risk level, reason |
+| `risk_rules` | id, extension, points, reason |
 
 ## Risk scoring
 
+Every rule that matches adds points and a written reason. The total decides the level. The values below are examples and will be finalized during development.
+
 | Rule | Points |
 |---|---|
-| SHA-256 found in the local threat list | +100 |
-| Executable or script extension | +20 |
-| Double extension hiding an executable type (`invoice.pdf.exe`) | +30 |
+| Risky extension (for example exe, bat, vbs, scr) | to be decided |
+| Double extension hiding the real type (for example `invoice.pdf.exe`) | to be decided |
+| Unusual file size | to be decided |
 
-70 or more is HIGH, 30 to 69 is MEDIUM, below 30 is LOW.
+The extension rules and their points are stored in MySQL, so they can be changed in the GUI without changing the code.
+
+## Technologies
+
+- Java (JDK)
+- Java Swing for the GUI
+- MySQL with JDBC
+- Git and GitHub for version control
+
+## Setup
+
+### Requirements
+
+- Java JDK [version]
+- MySQL Server [version]
+- MySQL Connector/J [version]
+
+### Database
+
+1. Create the database and tables by running the script `database.sql` from this repository.
+2. Put your own MySQL connection settings in the local configuration file described below. Do not commit your password.
+
+## Testing
+
+Planned test cases, all with safe files:
+
+- a normal text file
+- a normal image
+- a normal executable
+- a file with a renamed extension
+- a file with a double extension (an empty or plain-text file with that name)
+- an empty folder and an invalid folder path
+
+## Limitations
+
+- Scoring is based on simple rules, so it can produce false positives and false negatives.
+- A LOW score does not mean a file is safe, and a HIGH score does not mean a file is harmful.
+- The application only checks file properties such as name, size and extension.
+
+## Author
+
+Bobur Mirzarakhimov, individual project for Problem Solving and Lab : Java course.
 
 ## Test data
 
