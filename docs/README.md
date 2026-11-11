@@ -2,7 +2,7 @@
 
 A Java Swing desktop application in the cybersecurity area. It scans a folder, gives every file a simple, explainable risk score, and stores scan history and scoring rules in a MySQL database
 
-> SentinelScan gives risk indicators only. It does not claim to detect malware, and it is not a replacement for antivirus software. Only harmless test files are used in this project.
+> "SecondLook" gives risk indicators only. It does not claim to detect malware, and it is not a replacement for antivirus software. Only harmless test files are used in this project.
 
 **Status:** in development (individual course project)
 
