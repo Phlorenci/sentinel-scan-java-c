@@ -1,4 +1,4 @@
-# SentinelScan
+# SecondLook
 
 A Java Swing desktop application in the cybersecurity area. It scans a folder, gives every file a simple, explainable risk score, and stores scan history and scoring rules in a MySQL database
 
